@@ -1,7 +1,8 @@
+
 # OpenPediCare
-
 OpenPediCare is a pediatric post-visit care workspace for doctors and parents. A doctor enters only the child's basic details, records the visit, reviews a read-only live transcript, optionally adds physician notes, and generates:
-
+<img width="1306" height="689" alt="img1" src="https://github.com/user-attachments/assets/27f5c2cc-82cd-4401-8c5a-2c678dc8df09" />
+<img width="1865" height="834" alt="img2" src="https://github.com/user-attachments/assets/7f96ce6e-05e6-4fb4-8a82-a7dd1a4137bc" />
 - Visit summary
 - Parent education
 - Patient education tailored by age
