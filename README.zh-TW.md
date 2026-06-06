@@ -61,14 +61,6 @@ OPENAI_CHAT_MODEL=gpt-5.4-mini
 
 沒有 AI key 時會使用本機 mock fallback，方便測 UI 與流程；正式臨床文件請勿使用 mock。
 
-## 四宮格漫畫
-
-漫畫功能使用 OpenAI image generation。只有填入以下 key 時，畫面才會出現「Generate comic」按鈕：
-
-```text
-OPENAI_IMAGE_API_KEY=你的_openai_image_key
-OPENAI_IMAGE_BASE_URL=https://api.openai.com/v1
-OPENAI_IMAGE_MODEL=gpt-image-1-mini
 ```
 ## 即時語音
 
