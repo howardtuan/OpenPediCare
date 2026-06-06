@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Visit {{ visit.id }} | OpenPediCare{% endblock %}
+{% block body_class %}app-body{% endblock %}
+{% block content %}
+<section class="app-shell narrow">
+  <div class="app-header">
+    <div>
+      <p class="eyebrow">Visit Review</p>
+      <h1>{{ visit.patient.name }} · {{ visit.patient.age_years }} · {{ visit.patient.get_gender_display }}</h1>
+      <p>{{ visit.get_status_display }}</p>
+    </div>
+    <a class="button ghost" href="{% url 'doctor_dashboard' %}" data-i18n="review.back">Back to console</a>
+  </div>
+
+  <div class="review-grid">
+    <section class="panel">
+      <div class="panel-head"><h2 data-i18n="review.transcript">Transcript</h2></div>
+      <pre class="text-pre">{{ visit.transcript|default:"Not provided yet." }}</pre>
+    </section>
+    <section class="panel">
+      <div class="panel-head"><h2 data-i18n="review.notes">Physician notes</h2></div>
+      <pre class="text-pre">{{ visit.doctor_notes|default:"Not provided yet." }}</pre>
+    </section>
+  </div>
+
+  {% if visit.output %}
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <p class="eyebrow">Tri-Audience Output</p>
+        <h2 data-i18n="review.output">Analysis result</h2>
+      </div>
+    </div>
+    <div class="document-grid">
+      <article><h3 data-i18n="doctor.summaryTab">Visit summary</h3><p>{{ visit.output.visit_summary|default:visit.output.parent_summary|linebreaksbr }}</p></article>
+      <article><h3 data-i18n="doctor.parentTab">Parent education</h3><p>{{ visit.output.parent_education|default:visit.output.school_note|linebreaksbr }}</p></article>
+      <article><h3 data-i18n="doctor.patientTab">Patient education</h3><p>{{ visit.output.patient_education|default:visit.output.child_explanation|linebreaksbr }}</p></article>
+    </div>
+
+    {% if comic_generation_enabled or visit.output.comic_image %}
+    <div class="comic-box" data-visit-id="{{ visit.id }}">
+      <div class="comic-head">
+        <div>
+          <p class="eyebrow">Visual Education</p>
+          <h3 data-i18n="comic.title">Four-panel comic</h3>
+        </div>
+        {% if comic_generation_enabled %}
+          <button class="button secondary" type="button" data-generate-comic data-i18n="comic.generate">Generate comic</button>
+        {% endif %}
+      </div>
+      {% if visit.output.comic_image %}
+        <img class="comic-image" src="{{ visit.output.comic_image.url }}" alt="Generated four-panel education comic">
+      {% else %}
+        <p class="muted" data-i18n="comic.empty">No comic generated yet.</p>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="share-box">
+      <span data-i18n="doctor.parentLink">Parent view link</span>
+      <a href="{% url 'parent_portal' visit.share_token %}" target="_blank" rel="noreferrer">{{ request.scheme }}://{{ request.get_host }}{% url 'parent_portal' visit.share_token %}</a>
+    </div>
+  </section>
+  {% else %}
+  <section class="panel empty-state"><p data-i18n="review.noOutput">This visit has no generated output yet.</p></section>
+  {% endif %}
+</section>
+{% endblock %}

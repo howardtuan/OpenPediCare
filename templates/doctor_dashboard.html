@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+{% block title %}Doctor Console | OpenPediCare{% endblock %}
+{% block body_class %}app-body realtime-body{% endblock %}
+{% block content %}
+<section class="app-shell" data-page="doctor-dashboard">
+  <div class="app-header">
+    <div>
+      <p class="eyebrow">Realtime Pediatric Visit</p>
+      <h1 data-i18n="doctor.title">Realtime pediatric visit</h1>
+      <p data-i18n="doctor.subtitle">Enter the child's basic details, record the visit, review the read-only live transcript, optionally add notes, and generate clear post-visit education.</p>
+    </div>
+    <div class="header-metrics" aria-label="Doctor console summary">
+      <div><strong>{{ patients|length }}</strong><span data-i18n="doctor.metricPatients">Patients</span></div>
+      <div><strong>{{ visits|length }}</strong><span data-i18n="doctor.metricAnalyses">Analyses</span></div>
+      <div><strong>Live</strong><span data-i18n="doctor.metricSpeech">Speech</span></div>
+    </div>
+  </div>
+
+  <div class="workspace-tabs" role="tablist" aria-label="Doctor workspace tabs">
+    <button class="tab active" type="button" data-dashboard-tab="visit" data-i18n="doctor.tabVisit">Visit</button>
+    <button class="tab" type="button" data-dashboard-tab="history" data-i18n="doctor.tabHistory">Recent Analyses</button>
+  </div>
+
+  <div data-dashboard-panel="visit">
+    <div class="flow-strip" aria-label="Visit flow">
+      <div class="flow-item active" data-flow="patient"><span>1</span><strong data-i18n="doctor.flowPatient">Patient</strong><small data-i18n="doctor.flowPatientSmall">Name, age, sex</small></div>
+      <div class="flow-item" data-flow="record"><span>2</span><strong data-i18n="doctor.flowRecord">Record</strong><small data-i18n="doctor.flowRecordSmall">Speech to transcript</small></div>
+      <div class="flow-item" data-flow="note"><span>3</span><strong data-i18n="doctor.flowNote">Notes</strong><small data-i18n="doctor.flowNoteSmall">Skip or add context</small></div>
+      <div class="flow-item" data-flow="result"><span>4</span><strong data-i18n="doctor.flowResult">Analysis</strong><small data-i18n="doctor.flowResultSmall">Summary and education</small></div>
+    </div>
+
+    <div class="realtime-grid">
+      <section class="panel patient-card" aria-labelledby="patient-title">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">Start</p>
+            <h2 id="patient-title" data-i18n="doctor.patientTitle">Child basics</h2>
+          </div>
+        </div>
+        <form id="patient-form" class="patient-minimal-form">
+          <label>
+            <span data-i18n="doctor.patientName">Name</span>
+            <input name="name" data-i18n-placeholder="doctor.patientNamePlaceholder" placeholder="Demo Child" autocomplete="off" required>
+          </label>
+          <label>
+            <span data-i18n="doctor.patientAge">Age</span>
+            <input name="age_years" type="number" min="0" max="17" value="7" required>
+          </label>
+          <label>
+            <span data-i18n="doctor.patientSex">Sex</span>
+            <select name="gender" required>
+              <option value="female" data-i18n="gender.female">Female</option>
+              <option value="male" data-i18n="gender.male">Male</option>
+              <option value="other" data-i18n="gender.other">Other</option>
+              <option value="unknown" data-i18n="gender.unknown">Prefer not to say</option>
+            </select>
+          </label>
+          <button id="prepare-visit" class="button primary wide" type="submit" data-i18n="doctor.createAndRecord">Create case and start recording</button>
+        </form>
+
+        <div class="returning-patient">
+          <div>
+            <p class="eyebrow">Follow-up</p>
+            <h3 data-i18n="doctor.returningTitle">Returning patient</h3>
+            <p class="muted" data-i18n="doctor.returningCopy">Use this for follow-up visits so the History tab can stay focused on completed analyses.</p>
+          </div>
+          <select id="returning-patient-select" aria-label="Returning patient">
+            <option value="" data-i18n="doctor.returningPlaceholder">Choose an existing child</option>
+            {% for patient in patients %}
+              <option value="{{ patient.id }}" data-patient-name="{{ patient.name }}" data-patient-age="{{ patient.age_years }}" data-patient-gender="{{ patient.get_gender_display }}">
+                {{ patient.name }} · {{ patient.age_years }} · {{ patient.get_gender_display }}
+              </option>
+            {% endfor %}
+          </select>
+          <button id="use-returning-patient" class="button ghost wide" type="button" {% if not patients %}disabled{% endif %} data-i18n="doctor.startFollowUp">Start follow-up visit</button>
+        </div>
+
+        <div class="current-patient" id="current-patient" hidden>
+          <span data-i18n="doctor.currentPatient">Current case</span>
+          <strong></strong>
+        </div>
+      </section>
+
+      <section class="panel recording-card" aria-labelledby="record-title">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">Capture</p>
+            <h2 id="record-title" data-i18n="doctor.recordTitle">Recording and live transcript</h2>
+          </div>
+          <span id="session-status" class="status-pill idle" data-i18n="status.idle">Ready</span>
+        </div>
+
+        <div class="recorder-stage">
+          <div id="record-orb" class="record-orb" aria-hidden="true">
+            <span></span>
+          </div>
+          <div>
+            <h3 id="record-title-dynamic" data-i18n="doctor.recordReadyTitle">Ready to record</h3>
+            <p id="record-helper" data-i18n="doctor.recordReadyHelp">Chrome and Edge can show a read-only live transcript. Each sentence is placed on a new line.</p>
+          </div>
+        </div>
+
+        <div class="record-actions">
+          <button id="start-recording" class="button primary" type="button" disabled data-i18n="doctor.startRecording">Start recording</button>
+          <button id="pause-recording" class="button ghost" type="button" disabled data-i18n="doctor.pause">Pause</button>
+          <button id="stop-recording" class="button danger" type="button" disabled data-i18n="doctor.stopRecording">Stop recording</button>
+        </div>
+
+        <label class="transcript-box">
+          <span data-i18n="doctor.transcript">Live transcript</span>
+          <textarea id="transcript" rows="11" readonly aria-readonly="true" data-i18n-placeholder="doctor.transcriptPlaceholder" placeholder="The read-only transcript appears here sentence by sentence after recording starts."></textarea>
+        </label>
+      </section>
+
+      <section class="panel note-card locked" id="note-card" aria-labelledby="note-title">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">Before Analysis</p>
+            <h2 id="note-title" data-i18n="doctor.noteTitle">Add physician notes?</h2>
+          </div>
+        </div>
+        <p class="muted" data-i18n="doctor.noteCopy">After stopping the recording, you can add key instructions, medication wording, follow-up timing, or family questions. You can also skip this step.</p>
+        <label class="transcript-box">
+          <span data-i18n="doctor.notesLabel">Physician notes</span>
+          <textarea id="doctor-notes" rows="7" data-i18n-placeholder="doctor.notesPlaceholder" placeholder="Example: Return urgently if breathing worsens, lethargy appears, or urine output drops."></textarea>
+        </label>
+        <div class="note-actions">
+          <button id="skip-note" class="button ghost" type="button" disabled data-i18n="doctor.skipAnalyze">Skip and analyze</button>
+          <button id="analyze-with-note" class="button primary" type="button" disabled data-i18n="doctor.addAnalyze">Add notes and analyze</button>
+        </div>
+      </section>
+    </div>
+
+    <section class="panel output-panel realtime-output" aria-labelledby="output-title">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow">Output</p>
+          <h2 id="output-title" data-i18n="doctor.outputTitle">Analysis result</h2>
+        </div>
+        <span id="analysis-state" class="status-pill idle" data-i18n="status.waiting">Waiting</span>
+      </div>
+      <div class="tabs" role="tablist" aria-label="Output documents">
+        <button class="tab active" type="button" data-tab="summary" data-i18n="doctor.summaryTab">Visit summary</button>
+        <button class="tab" type="button" data-tab="parent" data-i18n="doctor.parentTab">Parent education</button>
+        <button class="tab" type="button" data-tab="patient" data-i18n="doctor.patientTab">Patient education</button>
+      </div>
+      <article id="output-content" class="output-content empty-state">
+        <p data-i18n="doctor.outputEmpty">After recording and notes are complete, the analysis result will appear here.</p>
+      </article>
+      <div id="comic-box" class="comic-box" hidden>
+        <div class="comic-head">
+          <div>
+            <p class="eyebrow">Visual Education</p>
+            <h3 data-i18n="comic.title">Four-panel comic</h3>
+          </div>
+          {% if comic_generation_enabled %}
+            <button id="generate-comic" class="button secondary" type="button" data-i18n="comic.generate">Generate comic</button>
+          {% endif %}
+        </div>
+        <img id="comic-image" class="comic-image" src="" alt="Generated four-panel education comic" hidden>
+        <p id="comic-hint" class="muted" data-i18n="comic.hint">The comic button appears only when OpenAI image generation is configured.</p>
+      </div>
+      <div id="share-box" class="share-box" hidden>
+        <span data-i18n="doctor.parentLink">Parent view link</span>
+        <a href="#" target="_blank" rel="noreferrer"></a>
+      </div>
+    </section>
+  </div>
+
+  <section class="history-panel" data-dashboard-panel="history" hidden>
+    <section class="panel analysis-history-card history-full" aria-labelledby="recent-title">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow">Recent Analyses</p>
+          <h2 id="recent-title" data-i18n="doctor.recentTitle">Recent analyses</h2>
+        </div>
+      </div>
+      <div class="visit-list">
+        {% for visit in visits %}
+          <a class="visit-row result-row" href="{% url 'doctor_visit_detail' visit.id %}">
+            <span class="visit-person">
+              <strong>{{ visit.patient.name }}</strong>
+              <small>{{ visit.patient.age_years }} · {{ visit.patient.get_gender_display }}</small>
+            </span>
+            <span class="visit-result">
+              {% if visit.output %}
+                <small>{{ visit.created_at|date:"Y-m-d H:i" }} · {{ visit.get_status_display }}</small>
+                <span>{{ visit.output.visit_summary|default:visit.output.parent_summary|truncatechars:120 }}</span>
+              {% else %}
+                <small class="muted-badge" data-i18n="doctor.notReady">Not generated yet</small>
+                <span>{{ visit.transcript|truncatechars:120|default:"No transcript yet" }}</span>
+              {% endif %}
+            </span>
+            <em data-i18n="doctor.viewResult">View</em>
+          </a>
+        {% empty %}
+          <p class="muted" data-i18n="doctor.noAnalyses">No analyses yet.</p>
+        {% endfor %}
+      </div>
+    </section>
+  </section>
+</section>
+{% endblock %}

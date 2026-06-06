@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}OpenPediCare | Pediatric AI Post-Visit Care{% endblock %}
+{% block body_class %}home-body{% endblock %}
+{% block content %}
+<section class="home-hero" aria-labelledby="home-title">
+  <div class="home-brand">
+    <span class="brand-mark large" aria-hidden="true"></span>
+    <h1 id="home-title">OpenPedi<span>Care</span></h1>
+  </div>
+  <p class="home-kicker" data-i18n="home.kicker">Pediatric AI post-visit care workspace</p>
+  <p class="home-copy" data-i18n="home.copy">Turn pediatric visit conversations into clear summaries, parent education, child-friendly guidance, and shareable follow-up documents.</p>
+
+  <div class="demo-link" aria-label="三階段框架">
+    <span class="play-dot" aria-hidden="true"></span>
+    <span>Capture → Context Assembly → Tri-Audience Output</span>
+  </div>
+
+  <div class="hero-actions">
+    <a class="button primary" href="{% url 'demo' %}" data-i18n="home.tryDemo">Try Demo</a>
+    <a class="button ghost" href="{% url 'login' %}" data-i18n="nav.signIn">Sign In</a>
+  </div>
+
+  <div class="home-note">
+    <p data-i18n="home.note1">OpenPediCare supports post-visit communication and does not replace clinical judgment.</p>
+    <p data-i18n="home.note2">Inspired by the PostVisit-style capture, context assembly, and multi-audience output pattern.</p>
+  </div>
+</section>
+{% endblock %}

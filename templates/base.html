@@ -1,0 +1,49 @@
+{% load static inline_static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token }}">
+  <title>{% block title %}OpenPediCare{% endblock %}</title>
+  <link rel="icon" href="{% static 'favicon.svg' %}?v=20260606-pink" type="image/svg+xml">
+  <link rel="shortcut icon" href="{% static 'favicon.svg' %}?v=20260606-pink" type="image/svg+xml">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}?v=20260606-2100">
+  <style id="openpedicare-critical-css">{% inline_static 'css/app.css' %}</style>
+</head>
+<body class="{% block body_class %}{% endblock %}">
+  {% block shell %}
+  <header class="topbar">
+    <a class="brand" href="{% url 'home' %}" aria-label="OpenPediCare home">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>OpenPedi<span>Care</span></span>
+    </a>
+    <nav class="topnav" aria-label="Primary navigation">
+      {% if request.user.is_authenticated %}
+        {% if request.user.profile.role == "doctor" %}
+          <a href="{% url 'doctor_dashboard' %}" data-i18n="nav.doctor">Doctor Console</a>
+        {% elif request.user.profile.role == "parent" %}
+          <a href="{% url 'parent_dashboard' %}" data-i18n="nav.parent">Parent Portal</a>
+        {% endif %}
+        <a href="{% url 'logout' %}" data-i18n="nav.logout">Sign Out</a>
+      {% else %}
+        <a href="{% url 'login' %}" data-i18n="nav.signIn">Sign In</a>
+      {% endif %}
+      <button id="language-toggle" class="language-toggle" type="button" aria-label="Switch language">中文</button>
+    </nav>
+  </header>
+  {% if messages %}
+    <div class="flash-stack" role="status" aria-live="polite">
+      {% for message in messages %}
+        <div class="flash {{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+  {% endblock %}
+  <script src="{% static 'js/app.js' %}?v=20260606-2100"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

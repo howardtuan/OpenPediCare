@@ -1,0 +1,29 @@
+services:
+  web:
+    build: .
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+      - ./media:/app/media
+    restart: unless-stopped
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    profiles:
+      - tunnel
+    depends_on:
+      - web
+    environment:
+      NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN}
+      NGROK_DOMAIN: ${NGROK_DOMAIN:-}
+    entrypoint:
+      - /bin/sh
+      - /ngrok-entrypoint.sh
+    volumes:
+      - ./scripts/ngrok-entrypoint.sh:/ngrok-entrypoint.sh:ro
+    ports:
+      - "4040:4040"
+    restart: unless-stopped

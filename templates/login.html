@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Sign In | OpenPediCare{% endblock %}
+{% block body_class %}auth-body{% endblock %}
+{% block content %}
+<section class="auth-panel" aria-labelledby="login-title">
+  <div>
+    <p class="eyebrow">OpenPediCare</p>
+    <h1 id="login-title" data-i18n="login.title">Sign in to your workspace</h1>
+    <p data-i18n="login.copy">Demo accounts can enter the full clinic and parent flows. Replace passwords and fill `.env` secrets before production.</p>
+  </div>
+  <form class="form-stack" method="post">
+    {% csrf_token %}
+    <label>
+      <span data-i18n="login.account">Account</span>
+      <input name="username" autocomplete="username" value="doctor@example.test" required>
+    </label>
+    <label>
+      <span data-i18n="login.password">Password</span>
+      <input name="password" type="password" autocomplete="current-password" value="Doctor123!" required>
+    </label>
+    <button class="button primary wide" type="submit" data-i18n="nav.signIn">Sign In</button>
+  </form>
+  <div class="auth-foot">
+    <span data-i18n="login.demoDoctor">Demo doctor</span>
+    <code>doctor@example.test / Doctor123!</code>
+    <span data-i18n="login.demoParent">Demo parent</span>
+    <code>parent@example.test / Parent123!</code>
+  </div>
+</section>
+{% endblock %}

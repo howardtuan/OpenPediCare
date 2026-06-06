@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Parent Portal | OpenPediCare{% endblock %}
+{% block body_class %}app-body portal-body{% endblock %}
+{% block content %}
+<section class="app-shell narrow">
+  <div class="app-header">
+    <div>
+      <p class="eyebrow">Parent Portal</p>
+      <h1 data-i18n="parent.title">Your child's post-visit care</h1>
+      <p data-i18n="parent.subtitle">Review recent visit summaries, parent education, child-friendly guidance, and generated comics when available.</p>
+    </div>
+  </div>
+
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <p class="eyebrow">Recent Analyses</p>
+        <h2 data-i18n="doctor.recentTitle">Recent analyses</h2>
+      </div>
+    </div>
+    <div class="visit-list">
+      {% for visit in visits %}
+        <a class="visit-row result-row" href="{% url 'parent_portal' visit.share_token %}">
+          <span class="visit-person">
+            <strong>{{ visit.patient.name }}</strong>
+            <small>{{ visit.patient.age_years }} · {{ visit.patient.get_gender_display }}</small>
+          </span>
+          <span class="visit-result">
+            {% if visit.output %}
+              <small>{{ visit.created_at|date:"Y-m-d H:i" }}</small>
+              <span>{{ visit.output.parent_education|default:visit.output.school_note|truncatechars:130 }}</span>
+            {% else %}
+              <small data-i18n="doctor.notReady">Not generated yet</small>
+              <span>{{ visit.transcript|truncatechars:130|default:"No transcript yet" }}</span>
+            {% endif %}
+          </span>
+          <em data-i18n="parent.open">Open</em>
+        </a>
+      {% empty %}
+        <p class="muted" data-i18n="parent.empty">No visits are linked to this parent account yet.</p>
+      {% endfor %}
+    </div>
+  </section>
+</section>
+{% endblock %}

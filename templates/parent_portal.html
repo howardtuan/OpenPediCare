@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}{{ visit.patient.name }} Post-Visit Care | OpenPediCare{% endblock %}
+{% block body_class %}portal-body{% endblock %}
+{% block content %}
+<section class="portal-shell">
+  <div class="portal-header">
+    <p class="eyebrow">Post-Visit Companion</p>
+    <h1>{{ visit.patient.name }} <span data-i18n="portal.titleTail">post-visit care</span></h1>
+    <p>{{ visit.patient.age_years }} · {{ visit.patient.get_gender_display }}</p>
+  </div>
+
+  <div class="portal-tabs" role="tablist" aria-label="Post-visit documents">
+    <button class="tab active" type="button" data-portal-tab="summary" data-i18n="doctor.summaryTab">Visit summary</button>
+    <button class="tab" type="button" data-portal-tab="parent" data-i18n="doctor.parentTab">Parent education</button>
+    <button class="tab" type="button" data-portal-tab="patient" data-i18n="doctor.patientTab">Patient education</button>
+  </div>
+
+  <article class="portal-document" data-portal-panel="summary">
+    <h2 data-i18n="doctor.summaryTab">Visit summary</h2>
+    <p>{{ visit.output.visit_summary|default:visit.output.parent_summary|linebreaksbr }}</p>
+  </article>
+  <article class="portal-document hidden" data-portal-panel="parent">
+    <h2 data-i18n="doctor.parentTab">Parent education</h2>
+    <p>{{ visit.output.parent_education|default:visit.output.school_note|linebreaksbr }}</p>
+  </article>
+  <article class="portal-document hidden" data-portal-panel="patient">
+    <h2>{{ visit.child_age_band }}</h2>
+    <p>{{ visit.output.patient_education|default:visit.output.child_explanation|linebreaksbr }}</p>
+  </article>
+
+  {% if visit.output.comic_image %}
+    <article class="portal-document comic-document">
+      <h2 data-i18n="comic.title">Four-panel comic</h2>
+      <img class="comic-image" src="{{ visit.output.comic_image.url }}" alt="Generated four-panel education comic">
+    </article>
+  {% endif %}
+
+  <div class="share-box">
+    <span>PDF</span>
+    <a href="{% url 'portal_school_pdf' visit.share_token %}" target="_blank" rel="noreferrer" data-i18n="portal.pdf">Download post-visit PDF</a>
+  </div>
+
+  <footer class="portal-foot">
+    <p data-i18n="portal.disclaimer">This page supports post-visit care. Follow the clinician's instructions and medication labels. Seek care promptly if warning signs appear.</p>
+  </footer>
+</section>
+{% endblock %}
