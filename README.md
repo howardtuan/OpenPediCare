@@ -6,7 +6,6 @@ OpenPediCare is a pediatric post-visit care workspace for doctors and parents. A
 - Visit summary
 - Parent education
 - Patient education tailored by age
-- Optional four-panel education comic
 - Shareable parent portal page and PDF output
 
 [繁體中文說明](README.zh-TW.md)
@@ -75,10 +74,6 @@ OPENAI_CHAT_MODEL=gpt-5.4-mini
 ```
 
 If no AI key is configured, OpenPediCare uses a local mock fallback so the UI and workflow can still be tested. Do not use mock output for production clinical documents.
-
-## Optional Four-Panel Comics
-
-Comic generation uses OpenAI image generation. The “Generate comic” button appears only when an image key is configured:
 
 ```text
 OPENAI_IMAGE_API_KEY=your_openai_image_key
@@ -184,7 +179,6 @@ Run tests:
 - `WebSocket /api/visit/transcribe/`
 - `POST /api/visit/complete`
 - `GET /api/output/{visit_id}`
-- `POST /api/output/{visit_id}/comic`
 - `GET /api/output/{visit_id}/school-note`
 
 ## Production Notes
