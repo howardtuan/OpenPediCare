@@ -86,12 +86,6 @@ OPENAI_IMAGE_BASE_URL=https://api.openai.com/v1
 OPENAI_IMAGE_MODEL=gpt-image-1-mini
 ```
 
-The comic prompt adapts by age:
-
-- Ages 3-5: visual, ultra-short, picture-book style.
-- Ages 6-11: story-based with simple science explanations.
-- Ages 12-17: more professional, semi-clinical, respectful of autonomy.
-
 ## Live Speech Transcription
 
 The doctor console uses the browser Web Speech API for live transcription.
@@ -123,7 +117,7 @@ Doctor flow:
 6. Stop recording.
 7. Skip notes or add physician notes.
 8. Generate post-visit output.
-9. Review summary, parent education, patient education, parent link, PDF, and optional comic.
+9. Review summary, parent education, patient education, parent link, and PDF.
 
 Returning patients:
 
@@ -135,7 +129,7 @@ Parent flow:
 
 1. Sign in as the parent demo account.
 2. Open linked post-visit records.
-3. Review parent education, patient education, PDF, and generated comic when available.
+3. Review parent education, patient education and PDF.
 4. Parents can also use the share link generated from a doctor visit.
 
 Language:
