@@ -73,14 +73,6 @@ OPENAI_BASE_URL=https://api.openai.com/v1
 OPENAI_CHAT_MODEL=gpt-5.4-mini
 ```
 
-If no AI key is configured, OpenPediCare uses a local mock fallback so the UI and workflow can still be tested. Do not use mock output for production clinical documents.
-
-```text
-OPENAI_IMAGE_API_KEY=your_openai_image_key
-OPENAI_IMAGE_BASE_URL=https://api.openai.com/v1
-OPENAI_IMAGE_MODEL=gpt-image-1-mini
-```
-
 ## Live Speech Transcription
 
 The doctor console uses the browser Web Speech API for live transcription.
