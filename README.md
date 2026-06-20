@@ -53,6 +53,39 @@ CSRF_TRUSTED_ORIGINS=http://localhost:8000,http://127.0.0.1:8000,https://*.ngrok
 SQLITE_PATH=data/db.sqlite3
 ```
 
+## LINE Bot Parent Lookup
+
+![LINE Bot parent lookup UIUX mockup](docs/images/linebot-parent-lookup-uiux.png)
+
+OpenPediCare includes a LINE Messaging API webhook so parents can type a child's visit lookup information and receive the most recent generated post-visit record.
+
+Webhook URL:
+
+```text
+https://your-public-domain.example/linebot/webhook
+```
+
+Parent input examples:
+
+```text
+查詢 Demo Child +1-555-0100
+查詢 Demo Child parent@example.test
+姓名：Demo Child
+手機：+1-555-0100
+```
+
+Required LINE settings:
+
+```text
+LINE_CHANNEL_SECRET=your_line_channel_secret
+LINE_CHANNEL_ACCESS_TOKEN=your_line_channel_access_token
+LINEBOT_PUBLIC_BASE_URL=https://your-public-domain.example
+```
+
+The bot verifies `X-Line-Signature` before parsing events, then matches child name plus guardian phone or email. If the data matches, it replies with the latest visit summary, parent education, warning signs, follow-up plan, and the parent portal link. If nothing matches, it returns a generic privacy-safe message.
+
+For production, keep `LINEBOT_REQUIRE_SIGNATURE=True`. Set `LINEBOT_ONLY_APPROVED_VISITS=True` if LINE should only show doctor-approved records.
+
 ## AI API
 
 Default provider is ikuncode with an OpenAI-compatible chat completions endpoint:
@@ -191,7 +224,10 @@ Run tests:
 - `GET /api/output/{visit_id}`
 - `POST /api/output/{visit_id}/comic`
 - `GET /api/output/{visit_id}/school-note`
+- `POST /linebot/webhook`
 
 ## Production Notes
 
 OpenPediCare supports post-visit communication and education. It is not a diagnostic device and does not replace clinician judgment. Before public deployment, rotate all secrets, disable debug mode, configure HTTPS, review data retention, and complete the security and compliance checks required by your clinical setting.
+
+LINE integration follows the official [webhook signature verification](https://developers.line.biz/en/docs/messaging-api/verify-webhook-signature/) and [reply message](https://developers.line.biz/en/reference/messaging-api/#send-reply-message) requirements.

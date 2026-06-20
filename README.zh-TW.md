@@ -62,6 +62,39 @@ OPENAI_CHAT_MODEL=gpt-5.4-mini
 
 沒有 AI key 時會使用本機 mock fallback，方便測 UI 與流程；正式臨床文件請勿使用 mock。
 
+## LINE Bot 家長查詢
+
+![LINE Bot 家長查詢 UIUX 模擬圖](docs/images/linebot-parent-lookup-uiux.png)
+
+OpenPediCare 已內建 LINE Messaging API webhook，家長可在 LINE Bot 輸入孩子姓名與家長手機或 Email，取得最近一次已產生的診後紀錄。
+
+Webhook URL：
+
+```text
+https://你的公開網域/linebot/webhook
+```
+
+家長輸入範例：
+
+```text
+查詢 Demo Child +1-555-0100
+查詢 Demo Child parent@example.test
+姓名：Demo Child
+手機：+1-555-0100
+```
+
+`.env` 必填：
+
+```text
+LINE_CHANNEL_SECRET=你的_LINE_channel_secret
+LINE_CHANNEL_ACCESS_TOKEN=你的_LINE_channel_access_token
+LINEBOT_PUBLIC_BASE_URL=https://你的公開網域
+```
+
+流程會先驗證 `X-Line-Signature`，再用「孩子姓名 + 家長手機或 Email」比對資料。吻合時，Bot 會回覆最近一次看診摘要、家長照護重點、警示徵兆、追蹤計畫與完整家長頁連結；不吻合時只回覆通用提示，避免揭露病患是否存在。
+
+正式上線請保持 `LINEBOT_REQUIRE_SIGNATURE=True`。若只想讓 LINE 顯示醫師已核准的紀錄，請設定 `LINEBOT_ONLY_APPROVED_VISITS=True`。
+
 ## 四宮格漫畫
 
 漫畫功能使用 OpenAI image generation。只有填入以下 key 時，畫面才會出現「Generate comic」按鈕：
@@ -150,3 +183,5 @@ python3 -m venv .venv
 ## 注意事項
 
 OpenPediCare 是診後溝通與衛教輔助工具，不是診斷裝置，也不取代醫師臨床判斷。正式公開部署前請更換所有 secret、關閉 debug、設定 HTTPS、審查資料保存政策，並依醫療場域要求完成資安與合規檢核。
+
+LINE 整合依照官方 [webhook signature verification](https://developers.line.biz/en/docs/messaging-api/verify-webhook-signature/) 與 [reply message](https://developers.line.biz/en/reference/messaging-api/#send-reply-message) 要求實作。

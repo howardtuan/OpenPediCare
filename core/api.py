@@ -16,6 +16,7 @@ from django.views.decorators.http import require_http_methods
 from core.models import Patient, Profile, TranscriptChunk, Visit
 from core.services.ai import generate_visit_output, output_to_dict
 from core.services.comics import generate_comic_for_output
+from core.services.linebot import message_objects_for_event, reply_to_line, verify_line_signature
 from core.services.pdf import build_school_note_pdf
 from core.services.transcription import transcribe_audio
 
@@ -299,6 +300,41 @@ def school_note_pdf(request, visit_id):
     pdf = build_school_note_pdf(visit)
     filename = f"openpedicare-school-note-{visit.id}.pdf"
     return FileResponse(pdf, as_attachment=True, filename=filename, content_type="application/pdf")
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def linebot_webhook(request):
+    signature = request.headers.get("X-Line-Signature", "")
+    if settings.LINEBOT_REQUIRE_SIGNATURE and not verify_line_signature(
+        request.body,
+        signature,
+        settings.LINE_CHANNEL_SECRET,
+    ):
+        return _json_error("LINE webhook signature 驗證失敗。", status=403, code="invalid_line_signature")
+
+    try:
+        payload = json.loads(request.body.decode("utf-8") or "{}")
+    except json.JSONDecodeError:
+        return _json_error("LINE webhook payload 不是有效 JSON。", status=400, code="invalid_json")
+
+    replies = []
+    for event in payload.get("events", []):
+        messages = message_objects_for_event(event, request)
+        reply_token = event.get("replyToken", "")
+        delivery = reply_to_line(reply_token, messages) if messages and reply_token else {"ok": True, "skipped": "no_reply"}
+        replies.append(
+            {
+                "event_type": event.get("type", ""),
+                "messages": messages,
+                "delivery": delivery,
+            }
+        )
+
+    response = {"ok": True, "events": len(payload.get("events", []))}
+    if settings.DEBUG:
+        response["replies"] = replies
+    return JsonResponse(response)
 
 
 @csrf_exempt

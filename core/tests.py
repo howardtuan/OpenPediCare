@@ -1,9 +1,12 @@
+import base64
+import hashlib
+import hmac
 import json
 
 from django.contrib.auth.models import User
 from django.test import Client, TestCase, override_settings
 
-from core.models import Patient, Profile, Visit
+from core.models import Patient, Profile, Visit, VisitOutput
 
 
 class OpenPediCareFlowTests(TestCase):
@@ -30,6 +33,18 @@ class OpenPediCareFlowTests(TestCase):
             data=json.dumps(payload),
             content_type="application/json",
             **headers,
+        )
+
+    def post_signed_line_webhook(self, payload, secret="line-test-secret", signature=None):
+        body = json.dumps(payload, separators=(",", ":")).encode("utf-8")
+        if signature is None:
+            digest = hmac.new(secret.encode("utf-8"), body, hashlib.sha256).digest()
+            signature = base64.b64encode(digest).decode("utf-8")
+        return self.client.post(
+            "/linebot/webhook",
+            data=body,
+            content_type="application/json",
+            HTTP_X_LINE_SIGNATURE=signature,
         )
 
     @override_settings(IKUNCODE_API_KEY="", OPENAI_API_KEY="")
@@ -95,3 +110,83 @@ class OpenPediCareFlowTests(TestCase):
         response = self.client.get("/doctor/")
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Realtime pediatric visit")
+
+    @override_settings(
+        DEBUG=True,
+        LINE_CHANNEL_SECRET="line-test-secret",
+        LINE_CHANNEL_ACCESS_TOKEN="",
+        LINEBOT_REQUIRE_SIGNATURE=True,
+    )
+    def test_linebot_accepts_verified_empty_webhook(self):
+        response = self.post_signed_line_webhook({"destination": "Udemo", "events": []})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["events"], 0)
+
+    @override_settings(
+        LINE_CHANNEL_SECRET="line-test-secret",
+        LINE_CHANNEL_ACCESS_TOKEN="",
+        LINEBOT_REQUIRE_SIGNATURE=True,
+    )
+    def test_linebot_rejects_invalid_signature(self):
+        response = self.post_signed_line_webhook({"destination": "Udemo", "events": []}, signature="bad")
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.json()["error"]["code"], "invalid_line_signature")
+
+    @override_settings(
+        DEBUG=True,
+        LINE_CHANNEL_SECRET="line-test-secret",
+        LINE_CHANNEL_ACCESS_TOKEN="",
+        LINEBOT_PUBLIC_BASE_URL="https://clinic.example.test",
+        LINEBOT_REQUIRE_SIGNATURE=True,
+        LINEBOT_ONLY_APPROVED_VISITS=False,
+    )
+    def test_linebot_returns_recent_parent_visit_record(self):
+        patient = Patient.objects.create(
+            doctor=self.doctor,
+            name="Demo Child",
+            guardian_name="Demo Parent",
+            guardian_email="parent@example.test",
+            guardian_phone="+1-555-0100",
+            age_years=7,
+            gender="female",
+        )
+        visit = Visit.objects.create(
+            doctor=self.doctor,
+            patient=patient,
+            clinical_scenario=Visit.SCENARIO_FEVER,
+            diagnosis="Fever follow-up",
+            consent_confirmed=True,
+            transcript="Fever and hydration counseling.",
+            doctor_notes="Return if lethargic.",
+            status=Visit.STATUS_REVIEW,
+        )
+        VisitOutput.objects.create(
+            visit=visit,
+            visit_summary="孩子昨天發燒，今日精神尚可，醫師已說明退燒與補水重點。",
+            parent_education="請規律補水、觀察活動力，依醫囑使用退燒藥。",
+            patient_education="多喝水並好好休息。",
+            parent_summary="孩子昨天發燒，今日精神尚可。",
+            child_explanation="多喝水並好好休息。",
+            school_note="請規律補水、觀察活動力。",
+            warning_signs=["呼吸急促", "精神明顯變差"],
+            follow_up_plan="若發燒超過三天或症狀惡化，請回診。",
+        )
+
+        payload = {
+            "destination": "Udemo",
+            "events": [
+                {
+                    "type": "message",
+                    "replyToken": "reply-token",
+                    "message": {"type": "text", "id": "1", "text": "查詢 Demo Child parent@example.test"},
+                    "source": {"type": "user", "userId": "Uparent"},
+                }
+            ],
+        }
+        response = self.post_signed_line_webhook(payload)
+        self.assertEqual(response.status_code, 200)
+        reply_text = response.json()["replies"][0]["messages"][0]["text"]
+        self.assertIn("OpenPediCare 最近一次診後紀錄", reply_text)
+        self.assertIn("Demo Child", reply_text)
+        self.assertIn("孩子昨天發燒", reply_text)
+        self.assertIn(f"https://clinic.example.test/portal/{visit.share_token}/", reply_text)

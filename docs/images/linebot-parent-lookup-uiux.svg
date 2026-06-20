@@ -1,0 +1,84 @@
+<svg width="1400" height="900" viewBox="0 0 1400 900" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">OpenPediCare LINE Bot parent lookup UIUX mockup</title>
+  <desc id="desc">A LINE chat mockup showing a parent entering child visit information and receiving the most recent OpenPediCare post-visit record.</desc>
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="24" flood-color="#17352f" flood-opacity="0.18"/>
+    </filter>
+    <linearGradient id="bg" x1="0" y1="0" x2="1400" y2="900" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F8FBF8"/>
+      <stop offset="1" stop-color="#EDF7F4"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1400" height="900" fill="url(#bg)"/>
+
+  <g transform="translate(78 72)">
+    <text x="0" y="0" fill="#13332D" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="40" font-weight="760">OpenPediCare LINE Bot</text>
+    <text x="0" y="48" fill="#52645F" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="20">家長輸入孩子姓名與聯絡資訊，即可取得最近一次診後照護紀錄。</text>
+  </g>
+
+  <g transform="translate(94 148)" filter="url(#shadow)">
+    <rect x="0" y="0" width="458" height="684" rx="46" fill="#111D1A"/>
+    <rect x="18" y="18" width="422" height="648" rx="34" fill="#F2F7F4"/>
+    <rect x="18" y="18" width="422" height="82" rx="34" fill="#06C755"/>
+    <rect x="160" y="30" width="120" height="8" rx="4" fill="#0F2E25" fill-opacity="0.25"/>
+    <circle cx="59" cy="63" r="21" fill="#E9FFF3"/>
+    <text x="92" y="58" fill="white" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="19" font-weight="740">OpenPediCare</text>
+    <text x="92" y="82" fill="#E8FFF1" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="13">診後照護查詢</text>
+
+    <rect x="42" y="128" width="270" height="86" rx="22" fill="white"/>
+    <text x="62" y="158" fill="#263C36" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="17" font-weight="700">請輸入查詢資訊</text>
+    <text x="62" y="184" fill="#60736D" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="15">姓名 + 手機或 Email</text>
+    <text x="62" y="204" fill="#60736D" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="15">資料吻合才會顯示紀錄</text>
+
+    <rect x="108" y="242" width="300" height="68" rx="24" fill="#D9FDD3"/>
+    <text x="132" y="271" fill="#1C382F" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="16">查詢 Demo Child</text>
+    <text x="132" y="295" fill="#1C382F" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="16">parent@example.test</text>
+
+    <rect x="42" y="338" width="346" height="244" rx="24" fill="white"/>
+    <text x="66" y="372" fill="#13332D" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="18" font-weight="760">最近一次診後紀錄</text>
+    <text x="66" y="404" fill="#42564F" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="15">兒童：Demo Child，7 歲</text>
+    <text x="66" y="428" fill="#42564F" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="15">看診：急性發燒 · Fever follow-up</text>
+    <line x1="66" y1="452" x2="348" y2="452" stroke="#E4ECE8"/>
+    <text x="66" y="482" fill="#13332D" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="15" font-weight="720">摘要</text>
+    <text x="66" y="508" fill="#52645F" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="14">昨天發燒，今日精神尚可；</text>
+    <text x="66" y="530" fill="#52645F" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="14">依醫囑補水、休息並觀察警示徵兆。</text>
+    <rect x="66" y="550" width="162" height="34" rx="17" fill="#E9F7F1"/>
+    <text x="84" y="573" fill="#087C4A" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="14" font-weight="700">開啟完整紀錄</text>
+
+    <rect x="42" y="610" width="366" height="36" rx="18" fill="white"/>
+    <text x="64" y="633" fill="#8A9B95" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="14">輸入訊息...</text>
+  </g>
+
+  <g transform="translate(628 178)">
+    <rect x="0" y="0" width="650" height="570" rx="32" fill="white" filter="url(#shadow)"/>
+    <text x="48" y="62" fill="#13332D" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="30" font-weight="780">家長查詢流程</text>
+    <text x="48" y="96" fill="#5F706B" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="17">Webhook 先驗證 LINE 簽章，再依姓名與聯絡資訊查詢最近一次紀錄。</text>
+
+    <g transform="translate(54 142)">
+      <circle cx="24" cy="24" r="24" fill="#06C755"/>
+      <text x="18" y="32" fill="white" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="20" font-weight="780">1</text>
+      <text x="70" y="16" fill="#13332D" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="20" font-weight="740">家長輸入看診資訊</text>
+      <text x="70" y="43" fill="#52645F" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="16">支援「查詢 姓名 手機」或「姓名： / Email：」分行格式。</text>
+    </g>
+
+    <g transform="translate(54 236)">
+      <circle cx="24" cy="24" r="24" fill="#06C755"/>
+      <text x="18" y="32" fill="white" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="20" font-weight="780">2</text>
+      <text x="70" y="16" fill="#13332D" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="20" font-weight="740">比對孩子姓名與家長聯絡資訊</text>
+      <text x="70" y="43" fill="#52645F" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="16">手機會正規化比對；Email 使用大小寫不敏感比對。</text>
+    </g>
+
+    <g transform="translate(54 330)">
+      <circle cx="24" cy="24" r="24" fill="#06C755"/>
+      <text x="18" y="32" fill="white" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="20" font-weight="780">3</text>
+      <text x="70" y="16" fill="#13332D" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="20" font-weight="740">回覆最近一次診後紀錄</text>
+      <text x="70" y="43" fill="#52645F" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="16">包含摘要、家長照護重點、警示徵兆與完整紀錄連結。</text>
+    </g>
+
+    <rect x="48" y="438" width="554" height="84" rx="22" fill="#F3FAF6"/>
+    <text x="74" y="472" fill="#0B6B44" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="18" font-weight="760">隱私保護</text>
+    <text x="74" y="500" fill="#52645F" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="16">查無或資料不吻合時，Bot 只回覆通用提示，不揭露是否存在病患資料。</text>
+  </g>
+</svg>
