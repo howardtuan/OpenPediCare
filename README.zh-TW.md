@@ -5,7 +5,6 @@ OpenPediCare 是兒科診後照護工作台。醫師一開始只需輸入兒童�
 - 看診摘要
 - 家長衛教內容
 - 依年齡調整的患者衛教內容
-- 選配四宮格衛教漫畫
 - 家長查閱頁與 PDF
 
 [English README](README.md)
@@ -62,6 +61,7 @@ OPENAI_CHAT_MODEL=gpt-5.4-mini
 
 沒有 AI key 時會使用本機 mock fallback，方便測 UI 與流程；正式臨床文件請勿使用 mock。
 
+<<<<<<< HEAD
 ## LINE Bot 家長查詢
 
 ![LINE Bot 家長查詢 UIUX 模擬圖](docs/images/linebot-parent-lookup-uiux.png)
@@ -103,14 +103,9 @@ LINEBOT_PUBLIC_BASE_URL=https://你的公開網域
 OPENAI_IMAGE_API_KEY=你的_openai_image_key
 OPENAI_IMAGE_BASE_URL=https://api.openai.com/v1
 OPENAI_IMAGE_MODEL=gpt-image-1-mini
+=======
+>>>>>>> 3d0a7ffb22e4d90c391f525076c777dbf4a8467f
 ```
-
-年齡分層：
-
-- 3-5 歲：圖像化、超簡短、繪本感。
-- 6-11 歲：故事化、簡單科學解釋。
-- 12-17 歲：較專業、半臨床語氣、尊重自主。
-
 ## 即時語音
 
 - 建議 Chrome 或 Edge。
@@ -132,7 +127,7 @@ OPENAI_IMAGE_MODEL=gpt-image-1-mini
 5. 暫停、繼續或停止錄音。
 6. 跳過備註或填寫醫師補充。
 7. 產生看診摘要、家長衛教與患者衛教。
-8. 查看家長連結、PDF 與選配漫畫。
+8. 查看家長連結與PDF。
 
 回診患者：
 
@@ -144,7 +139,7 @@ OPENAI_IMAGE_MODEL=gpt-image-1-mini
 
 1. 登入家長帳號。
 2. 查看已連結診次。
-3. 開啟家長衛教、患者衛教、PDF 與已生成的漫畫。
+3. 開啟家長衛教與PDF。
 4. 也可使用醫師分享的家長查閱連結。
 
 語言：
