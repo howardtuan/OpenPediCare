@@ -55,7 +55,7 @@ SQLITE_PATH=data/db.sqlite3
 
 ## LINE Bot Parent Lookup
 
-![LINE Bot parent lookup UIUX mockup](docs/images/linebot-parent-lookup-uiux.png)
+![LINE Bot parent lookup UIUX mockup](docs/images/linebot-parent-lookup-uiux-en.png)
 
 OpenPediCare includes a LINE Messaging API webhook so parents can type a child's visit lookup information and receive the most recent generated post-visit record.
 
