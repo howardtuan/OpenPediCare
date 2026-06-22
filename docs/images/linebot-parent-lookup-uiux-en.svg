@@ -15,7 +15,7 @@
 
   <g transform="translate(78 72)">
     <text x="0" y="0" fill="#13332D" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="40" font-weight="760">OpenPediCare LINE Bot</text>
-    <text x="0" y="48" fill="#52645F" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="20">Parents enter child lookup details to receive the latest post-visit care record.</text>
+    <text x="0" y="48" fill="#52645F" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="20">Parents add the bot before the visit, bind details, then retrieve the latest record.</text>
   </g>
 
   <g transform="translate(94 148)" filter="url(#shadow)">
@@ -28,12 +28,12 @@
     <text x="92" y="82" fill="#E8FFF1" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="13">Post-visit lookup</text>
 
     <rect x="42" y="128" width="270" height="86" rx="22" fill="white"/>
-    <text x="62" y="158" fill="#263C36" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="17" font-weight="700">Enter lookup details</text>
-    <text x="62" y="184" fill="#60736D" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="15">Name + phone or email</text>
-    <text x="62" y="204" fill="#60736D" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="15">Records appear only after a match</text>
+    <text x="62" y="158" fill="#263C36" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="17" font-weight="700">Bind before the visit</text>
+    <text x="62" y="184" fill="#60736D" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="15">Child name + guardian contact</text>
+    <text x="62" y="204" fill="#60736D" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="15">Use the same contact at clinic</text>
 
     <rect x="108" y="242" width="300" height="68" rx="24" fill="#D9FDD3"/>
-    <text x="132" y="271" fill="#1C382F" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="16">Lookup Demo Child</text>
+    <text x="132" y="271" fill="#1C382F" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="16">Bind Demo Child</text>
     <text x="132" y="295" fill="#1C382F" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="16">parent@example.test</text>
 
     <rect x="42" y="338" width="346" height="244" rx="24" fill="white"/>
@@ -53,28 +53,28 @@
 
   <g transform="translate(628 178)">
     <rect x="0" y="0" width="650" height="570" rx="32" fill="white" filter="url(#shadow)"/>
-    <text x="48" y="62" fill="#13332D" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="30" font-weight="780">Parent Lookup Flow</text>
-    <text x="48" y="96" fill="#5F706B" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="17">The webhook verifies the LINE signature, then finds the latest matched record.</text>
+    <text x="48" y="62" fill="#13332D" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="30" font-weight="780">Parent Binding Flow</text>
+    <text x="48" y="96" fill="#5F706B" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="17">The webhook verifies LINE, stores userId binding, then finds the latest record.</text>
 
     <g transform="translate(54 142)">
       <circle cx="24" cy="24" r="24" fill="#06C755"/>
       <text x="18" y="32" fill="white" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="20" font-weight="780">1</text>
-      <text x="70" y="16" fill="#13332D" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="20" font-weight="740">Parent enters visit lookup details</text>
-      <text x="70" y="43" fill="#52645F" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="16">Supports "Lookup name phone" or multiline name/email formats.</text>
+      <text x="70" y="16" fill="#13332D" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="20" font-weight="740">Parent adds friend and binds before visit</text>
+      <text x="70" y="43" fill="#52645F" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="16">The bot saves LINE userId with child name and guardian contact.</text>
     </g>
 
     <g transform="translate(54 236)">
       <circle cx="24" cy="24" r="24" fill="#06C755"/>
       <text x="18" y="32" fill="white" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="20" font-weight="780">2</text>
-      <text x="70" y="16" fill="#13332D" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="20" font-weight="740">Match child name and guardian contact</text>
-      <text x="70" y="43" fill="#52645F" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="16">Phone numbers are normalized; email matching ignores case.</text>
+      <text x="70" y="16" fill="#13332D" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="20" font-weight="740">Doctor records visit with same contact</text>
+      <text x="70" y="43" fill="#52645F" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="16">Patient guardian phone/email links the web visit to LINE binding.</text>
     </g>
 
     <g transform="translate(54 330)">
       <circle cx="24" cy="24" r="24" fill="#06C755"/>
       <text x="18" y="32" fill="white" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="20" font-weight="780">3</text>
-      <text x="70" y="16" fill="#13332D" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="20" font-weight="740">Reply with the latest post-visit record</text>
-      <text x="70" y="43" fill="#52645F" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="16">Includes summary, care guidance, warning signs, and full record link.</text>
+      <text x="70" y="16" fill="#13332D" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="20" font-weight="740">Parent sends Latest after the visit</text>
+      <text x="70" y="43" fill="#52645F" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Segoe UI', sans-serif" font-size="16">Bot replies with summary, care guidance, warning signs, and link.</text>
     </g>
 
     <rect x="48" y="438" width="554" height="84" rx="22" fill="#F3FAF6"/>

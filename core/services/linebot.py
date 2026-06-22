@@ -11,13 +11,15 @@ from urllib.request import Request, urlopen
 from django.conf import settings
 from django.utils import timezone
 
-from core.models import Patient, Visit
+from core.models import LineParentLink, Patient, Visit
 
 
 logger = logging.getLogger(__name__)
 
 HELP_KEYWORDS = {"help", "start", "說明", "幫助", "查詢格式", "格式", "開始"}
 QUERY_PREFIXES = ("查詢", "查紀錄", "看診紀錄", "最近一次", "最近紀錄", "病歷")
+BIND_PREFIXES = ("綁定", "綁定資料", "綁定孩子", "bind", "link")
+LATEST_KEYWORDS = {"最新", "最新紀錄", "最近", "最近紀錄", "查詢最新", "latest", "record"}
 LINE_TEXT_LIMIT = 5000
 LINE_REPLY_MESSAGE_LIMIT = 5
 
@@ -33,21 +35,24 @@ def verify_line_signature(body, signature, channel_secret):
 def build_help_text():
     return (
         "OpenPediCare LINE 查詢\n"
-        "請輸入孩子姓名與家長手機或 Email，系統會回覆最近一次已產生的診後紀錄。\n\n"
-        "格式範例：\n"
-        "查詢 Demo Child +1-555-0100\n"
-        "查詢 Demo Child parent@example.test\n\n"
+        "看診前請先加好友並綁定孩子資料；看診完成後，輸入「最新」即可取得最近一次已產生的診後紀錄。\n\n"
+        "看診前綁定範例：\n"
+        "綁定 Demo Child +1-555-0100\n"
+        "綁定 Demo Child parent@example.test\n\n"
+        "看診後查詢：\n"
+        "最新\n\n"
         "也可以分行輸入：\n"
         "姓名：Demo Child\n"
         "手機：+1-555-0100\n\n"
-        "為保護隱私，姓名與聯絡資訊都吻合時才會顯示紀錄。"
+        "為保護隱私，LINE 帳號、姓名與聯絡資訊都吻合時才會顯示紀錄。"
     )
 
 
 def message_objects_for_event(event, request):
     event_type = event.get("type")
+    line_user_id = (event.get("source") or {}).get("userId", "")
     if event_type == "follow":
-        return _text_messages("歡迎使用 OpenPediCare。\n\n" + build_help_text())
+        return _text_messages("歡迎使用 OpenPediCare。看診前請先完成 LINE 綁定。\n\n" + build_help_text())
 
     if event_type != "message":
         return []
@@ -60,13 +65,26 @@ def message_objects_for_event(event, request):
     if not text or _is_help_request(text):
         return _text_messages(build_help_text())
 
+    if _is_latest_request(text):
+        if not line_user_id:
+            return _text_messages("請在一對一 LINE 聊天室使用「最新」查詢。")
+        visit, reason = find_recent_visit_for_line_user(line_user_id)
+        if not visit:
+            return _text_messages(_not_found_text(reason))
+        return _text_messages(_visit_reply_text(visit, _public_base_url(request)))
+
     query = parse_lookup_text(text)
     if not query:
         return _text_messages("我還需要孩子姓名與家長手機或 Email 才能查詢。\n\n" + build_help_text())
 
     child_name, contact = query
+    if line_user_id:
+        bind_line_parent(line_user_id, child_name, contact)
+
     visit, reason = find_recent_visit(child_name, contact)
     if not visit:
+        if line_user_id:
+            return _text_messages(_bound_without_record_text(child_name))
         return _text_messages(_not_found_text(reason))
 
     return _text_messages(_visit_reply_text(visit, _public_base_url(request)))
@@ -129,6 +147,41 @@ def find_recent_visit(child_name, contact):
     visit = visits.first()
     if not visit:
         return None, "no_output"
+    return visit, "ok"
+
+
+def bind_line_parent(line_user_id, child_name, contact):
+    email = contact.strip().lower() if "@" in contact else ""
+    phone = "" if email else contact.strip()
+    link, _ = LineParentLink.objects.get_or_create(
+        line_user_id=line_user_id,
+        child_name=child_name.strip(),
+        guardian_email=email,
+        guardian_phone=phone,
+    )
+    link.last_lookup_at = timezone.now()
+    link.save(update_fields=["last_lookup_at", "updated_at"])
+    return link
+
+
+def find_recent_visit_for_line_user(line_user_id):
+    links = list(LineParentLink.objects.filter(line_user_id=line_user_id))
+    if not links:
+        return None, "not_bound"
+
+    visits = []
+    for link in links:
+        visit, _ = find_recent_visit(link.child_name, _link_contact(link))
+        if visit:
+            visits.append((visit, link))
+
+    if not visits:
+        LineParentLink.objects.filter(id__in=[link.id for link in links]).update(last_lookup_at=timezone.now())
+        return None, "no_output"
+
+    visit, link = max(visits, key=lambda item: item[0].created_at)
+    link.last_lookup_at = timezone.now()
+    link.save(update_fields=["last_lookup_at", "updated_at"])
     return visit, "ok"
 
 
@@ -196,8 +249,8 @@ def _field_key(label):
 
 def _strip_query_prefix(text):
     cleaned = " ".join(text.strip().split())
-    for prefix in QUERY_PREFIXES:
-        if cleaned.startswith(prefix):
+    for prefix in BIND_PREFIXES + QUERY_PREFIXES:
+        if cleaned.lower().startswith(prefix.lower()):
             return cleaned[len(prefix) :].strip(" ：:")
     return cleaned
 
@@ -216,15 +269,33 @@ def _is_help_request(text):
     return text.strip().lower() in HELP_KEYWORDS
 
 
+def _is_latest_request(text):
+    return " ".join(text.strip().lower().split()) in LATEST_KEYWORDS
+
+
 def _not_found_text(reason):
+    if reason == "not_bound":
+        return (
+            "這個 LINE 帳號尚未綁定孩子資料。\n"
+            "看診前請先輸入：綁定 孩子姓名 家長手機或Email\n"
+            "例如：綁定 Demo Child parent@example.test"
+        )
     if reason == "no_output":
         return (
-            "已找到符合的孩子資料，但目前沒有可查閱的診後紀錄。\n"
-            "可能是醫師尚未產生或尚未發布本次紀錄，請稍後再試或聯絡診所。"
+            "LINE 綁定已存在，但目前沒有可查閱的診後紀錄。\n"
+            "可能是醫師尚未完成本次紀錄，請看診後稍候再輸入「最新」。"
         )
     return (
         "找不到可查閱的診後紀錄。\n"
         "請確認孩子姓名與家長手機/Email 與診所登記資料一致；為保護隱私，資料不吻合時不會顯示紀錄。"
+    )
+
+
+def _bound_without_record_text(child_name):
+    return (
+        f"已完成 {child_name} 的 LINE 綁定。\n"
+        "看診完成、醫師產生診後紀錄後，請在這裡輸入「最新」查看。\n"
+        "若診所登記的姓名或聯絡資訊不同，系統會基於隱私保護而不顯示紀錄。"
     )
 
 
@@ -272,6 +343,10 @@ def _warning_signs_text(value):
     if isinstance(value, list):
         return "\n".join(f"- {item}" for item in value if item)
     return str(value)
+
+
+def _link_contact(link):
+    return link.guardian_email or link.guardian_phone
 
 
 def _public_base_url(request):

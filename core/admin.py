@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Patient, Profile, TranscriptChunk, Visit, VisitOutput
+from .models import LineParentLink, Patient, Profile, TranscriptChunk, Visit, VisitOutput
 
 
 @admin.register(Profile)
@@ -15,6 +15,13 @@ class PatientAdmin(admin.ModelAdmin):
     list_display = ("name", "gender", "guardian_name", "age_years", "weight_kg", "doctor", "updated_at")
     list_filter = ("gender", "primary_language")
     search_fields = ("name", "guardian_name", "guardian_email", "guardian_phone")
+
+
+@admin.register(LineParentLink)
+class LineParentLinkAdmin(admin.ModelAdmin):
+    list_display = ("line_user_id", "child_name", "guardian_email", "guardian_phone", "updated_at", "last_lookup_at")
+    search_fields = ("line_user_id", "child_name", "guardian_email", "guardian_phone")
+    list_filter = ("created_at", "updated_at")
 
 
 class VisitOutputInline(admin.StackedInline):

@@ -60,6 +60,29 @@ class Patient(models.Model):
         return self.name
 
 
+class LineParentLink(models.Model):
+    line_user_id = models.CharField(max_length=80, db_index=True)
+    child_name = models.CharField(max_length=120)
+    guardian_email = models.EmailField(blank=True)
+    guardian_phone = models.CharField(max_length=40, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    last_lookup_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-updated_at"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["line_user_id", "child_name", "guardian_email", "guardian_phone"],
+                name="unique_line_parent_child_contact",
+            )
+        ]
+
+    def __str__(self):
+        contact = self.guardian_email or self.guardian_phone
+        return f"{self.child_name} ({contact})"
+
+
 class Visit(models.Model):
     STATUS_DRAFT = "draft"
     STATUS_RECORDING = "recording"

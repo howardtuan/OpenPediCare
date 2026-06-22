@@ -61,12 +61,11 @@ OPENAI_CHAT_MODEL=gpt-5.4-mini
 
 沒有 AI key 時會使用本機 mock fallback，方便測 UI 與流程；正式臨床文件請勿使用 mock。
 
-<<<<<<< HEAD
 ## LINE Bot 家長查詢
 
 ![LINE Bot 家長查詢 UIUX 模擬圖](docs/images/linebot-parent-lookup-uiux.png)
 
-OpenPediCare 已內建 LINE Messaging API webhook，家長可在 LINE Bot 輸入孩子姓名與家長手機或 Email，取得最近一次已產生的診後紀錄。
+OpenPediCare 已內建 LINE Messaging API webhook，支援完整家長流程：家長在看診前先加入 LINE Bot 好友並綁定孩子資料，看診後即可用同一個 LINE 帳號取得最近一次已產生的診後紀錄。
 
 Webhook URL：
 
@@ -74,13 +73,21 @@ Webhook URL：
 https://你的公開網域/linebot/webhook
 ```
 
+家長流程：
+
+1. 看診前，家長先加入 LINE 官方帳號好友。
+2. 家長在一對一聊天室綁定孩子姓名與家長手機或 Email。
+3. 醫師建立或選擇患者時，使用同一組家長手機或 Email。
+4. 看診完成並產生診後紀錄後，家長輸入 `最新`。
+
 家長輸入範例：
 
 ```text
-查詢 Demo Child +1-555-0100
-查詢 Demo Child parent@example.test
+綁定 Demo Child +1-555-0100
+綁定 Demo Child parent@example.test
 姓名：Demo Child
-手機：+1-555-0100
+Email：parent@example.test
+最新
 ```
 
 `.env` 必填：
@@ -91,7 +98,7 @@ LINE_CHANNEL_ACCESS_TOKEN=你的_LINE_channel_access_token
 LINEBOT_PUBLIC_BASE_URL=https://你的公開網域
 ```
 
-流程會先驗證 `X-Line-Signature`，再用「孩子姓名 + 家長手機或 Email」比對資料。吻合時，Bot 會回覆最近一次看診摘要、家長照護重點、警示徵兆、追蹤計畫與完整家長頁連結；不吻合時只回覆通用提示，避免揭露病患是否存在。
+流程會先驗證 `X-Line-Signature`。綁定時會保存 LINE userId、孩子姓名與家長手機或 Email；後續查詢會用同一個 LINE userId，加上患者資料中的家長聯絡資訊比對。吻合時，Bot 會回覆最近一次看診摘要、家長照護重點、警示徵兆、追蹤計畫與完整家長頁連結；不吻合時只回覆通用提示，避免揭露病患是否存在。
 
 正式上線請保持 `LINEBOT_REQUIRE_SIGNATURE=True`。若只想讓 LINE 顯示醫師已核准的紀錄，請設定 `LINEBOT_ONLY_APPROVED_VISITS=True`。
 
@@ -103,8 +110,6 @@ LINEBOT_PUBLIC_BASE_URL=https://你的公開網域
 OPENAI_IMAGE_API_KEY=你的_openai_image_key
 OPENAI_IMAGE_BASE_URL=https://api.openai.com/v1
 OPENAI_IMAGE_MODEL=gpt-image-1-mini
-=======
->>>>>>> 3d0a7ffb22e4d90c391f525076c777dbf4a8467f
 ```
 ## 即時語音
 

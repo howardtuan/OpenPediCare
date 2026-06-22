@@ -57,7 +57,7 @@ SQLITE_PATH=data/db.sqlite3
 
 ![LINE Bot parent lookup UIUX mockup](docs/images/linebot-parent-lookup-uiux-en.png)
 
-OpenPediCare includes a LINE Messaging API webhook so parents can type a child's visit lookup information and receive the most recent generated post-visit record.
+OpenPediCare includes a LINE Messaging API webhook for the full parent flow: parents add the bot before the visit, bind their LINE account to the child and guardian contact, and later receive the most recent generated post-visit record from the same LINE account.
 
 Webhook URL:
 
@@ -65,13 +65,21 @@ Webhook URL:
 https://your-public-domain.example/linebot/webhook
 ```
 
+Parent flow:
+
+1. Before the visit, the parent adds the LINE official account as a friend.
+2. The parent binds the child and guardian contact in the one-to-one chat.
+3. The doctor creates or selects the patient using the same guardian phone or email.
+4. After the visit output is generated, the parent sends `Latest`.
+
 Parent input examples:
 
 ```text
-查詢 Demo Child +1-555-0100
-查詢 Demo Child parent@example.test
-姓名：Demo Child
-手機：+1-555-0100
+Bind Demo Child +1-555-0100
+Bind Demo Child parent@example.test
+Name: Demo Child
+Email: parent@example.test
+Latest
 ```
 
 Required LINE settings:
@@ -82,7 +90,7 @@ LINE_CHANNEL_ACCESS_TOKEN=your_line_channel_access_token
 LINEBOT_PUBLIC_BASE_URL=https://your-public-domain.example
 ```
 
-The bot verifies `X-Line-Signature` before parsing events, then matches child name plus guardian phone or email. If the data matches, it replies with the latest visit summary, parent education, warning signs, follow-up plan, and the parent portal link. If nothing matches, it returns a generic privacy-safe message.
+The bot verifies `X-Line-Signature` before parsing events. Binding stores the LINE user ID with child name and guardian phone/email. Later lookups use that LINE user ID plus the matching patient contact to return the latest visit summary, parent education, warning signs, follow-up plan, and parent portal link. If nothing matches, it returns a generic privacy-safe message.
 
 For production, keep `LINEBOT_REQUIRE_SIGNATURE=True`. Set `LINEBOT_ONLY_APPROVED_VISITS=True` if LINE should only show doctor-approved records.
 

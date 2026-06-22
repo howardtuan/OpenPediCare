@@ -6,7 +6,7 @@ import json
 from django.contrib.auth.models import User
 from django.test import Client, TestCase, override_settings
 
-from core.models import Patient, Profile, Visit, VisitOutput
+from core.models import LineParentLink, Patient, Profile, Visit, VisitOutput
 
 
 class OpenPediCareFlowTests(TestCase):
@@ -190,3 +190,100 @@ class OpenPediCareFlowTests(TestCase):
         self.assertIn("Demo Child", reply_text)
         self.assertIn("孩子昨天發燒", reply_text)
         self.assertIn(f"https://clinic.example.test/portal/{visit.share_token}/", reply_text)
+
+    @override_settings(
+        DEBUG=True,
+        LINE_CHANNEL_SECRET="line-test-secret",
+        LINE_CHANNEL_ACCESS_TOKEN="",
+        LINEBOT_PUBLIC_BASE_URL="https://clinic.example.test",
+        LINEBOT_REQUIRE_SIGNATURE=True,
+        LINEBOT_ONLY_APPROVED_VISITS=False,
+    )
+    def test_linebot_previsit_bind_then_latest_lookup_after_visit(self):
+        follow_response = self.post_signed_line_webhook(
+            {
+                "destination": "Udemo",
+                "events": [
+                    {
+                        "type": "follow",
+                        "replyToken": "follow-reply",
+                        "source": {"type": "user", "userId": "Uparent-previsit"},
+                    }
+                ],
+            }
+        )
+        self.assertEqual(follow_response.status_code, 200)
+        self.assertIn("看診前請先完成 LINE 綁定", follow_response.json()["replies"][0]["messages"][0]["text"])
+
+        bind_response = self.post_signed_line_webhook(
+            {
+                "destination": "Udemo",
+                "events": [
+                    {
+                        "type": "message",
+                        "replyToken": "bind-reply",
+                        "message": {"type": "text", "id": "2", "text": "綁定 Demo Child parent@example.test"},
+                        "source": {"type": "user", "userId": "Uparent-previsit"},
+                    }
+                ],
+            }
+        )
+        self.assertEqual(bind_response.status_code, 200)
+        self.assertIn("已完成 Demo Child 的 LINE 綁定", bind_response.json()["replies"][0]["messages"][0]["text"])
+        self.assertTrue(
+            LineParentLink.objects.filter(
+                line_user_id="Uparent-previsit",
+                child_name="Demo Child",
+                guardian_email="parent@example.test",
+            ).exists()
+        )
+
+        patient = Patient.objects.create(
+            doctor=self.doctor,
+            name="Demo Child",
+            guardian_name="Demo Parent",
+            guardian_email="parent@example.test",
+            guardian_phone="+1-555-0100",
+            age_years=7,
+            gender="female",
+        )
+        visit = Visit.objects.create(
+            doctor=self.doctor,
+            patient=patient,
+            clinical_scenario=Visit.SCENARIO_FEVER,
+            diagnosis="Fever follow-up",
+            consent_confirmed=True,
+            transcript="Fever and hydration counseling.",
+            doctor_notes="Return if lethargic.",
+            status=Visit.STATUS_REVIEW,
+        )
+        VisitOutput.objects.create(
+            visit=visit,
+            visit_summary="看診後摘要：發燒改善中，需補水與觀察精神狀態。",
+            parent_education="家長照護：按醫囑用藥、補水、休息。",
+            patient_education="多喝水並休息。",
+            parent_summary="看診後摘要：發燒改善中。",
+            child_explanation="多喝水並休息。",
+            school_note="按醫囑用藥、補水、休息。",
+            warning_signs=["呼吸急促", "嗜睡"],
+            follow_up_plan="若症狀惡化請回診。",
+        )
+
+        latest_response = self.post_signed_line_webhook(
+            {
+                "destination": "Udemo",
+                "events": [
+                    {
+                        "type": "message",
+                        "replyToken": "latest-reply",
+                        "message": {"type": "text", "id": "3", "text": "最新"},
+                        "source": {"type": "user", "userId": "Uparent-previsit"},
+                    }
+                ],
+            }
+        )
+        self.assertEqual(latest_response.status_code, 200)
+        latest_text = latest_response.json()["replies"][0]["messages"][0]["text"]
+        self.assertIn("OpenPediCare 最近一次診後紀錄", latest_text)
+        self.assertIn("看診後摘要", latest_text)
+        self.assertIn(f"https://clinic.example.test/portal/{visit.share_token}/", latest_text)
